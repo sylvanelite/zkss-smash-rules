@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>AU</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <meta charset="utf-8">
+
+	<script type="text/javascript" src="./jquery.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>
+	<style type="text/css">
+	.dvStage{
+		background-color:green;
+	}
+	.banned{
+		background-color:red;
+	}
+	.dvGame.active{
+		border:4px solid black;
+	}
+	</style>
+<script type="text/javascript">
+let S = {};
+S.init = function (){
+	let isPlayer1First = (Math.random() >= 0.5);
+	let text = "";
+	if (isPlayer1First) {
+		text="Player 1";
+	}else{
+		text="Player 2";
+	}
+	$("#spnPlayerGame1").text(text+" bans 2 stages");
+	
+	let game1BanCount = 0;
+	let game2BanCount = 0;
+	let gameNumber=1;
+	let player1Won = false;
+	let stageClick =function(){
+		$(this).addClass("banned");
+		$(this).off("click");
+		if($("#spnPlayerGame1").is(":visible")){
+			//banning for game 1
+			game1BanCount+=1;
+			if(game1BanCount==1){
+				$("#spnPlayerGame1").text(text+" bans 1 more stage.");
+			}
+			if(game1BanCount==2){
+				if (isPlayer1First) {
+					text="Player 2";
+				}else{
+					text="Player 1";
+				}
+				$("#spnPlayerGame1").text(text+" bans 3 stages");
+			}
+			if(game1BanCount==3){
+				$("#spnPlayerGame1").text(text+" bans 2 more stages.");
+			}
+			if(game1BanCount==4){
+				$("#spnPlayerGame1").text(text+" bans 1 more stage.");
+			}
+			if(game1BanCount==5){
+				if (isPlayer1First) {
+					text="Player 1";
+				}else{
+					text="Player 2";
+				}
+				$("#spnPlayerGame1").text(text+" bans 1 more stages");
+			}
+			if(game1BanCount==6){
+			
+				$("#spnPlayerGame1").text("Play on"+$(".dvStage:not(.banned)").text());
+				$("#btnGame2").show();
+			}
+		}
+		if($("#spnPlayerGame2").is(":visible")){
+			//banning for game 2
+			game2BanCount+=1;	
+			if(game2BanCount==1){
+				$("#spnPlayerGame2").text("Player "+(player1Won?"1":"2")+" bans 1 more stage");
+			}
+			if(game2BanCount==2){
+				$("#spnPlayerGame2").text("Player "+(player1Won?"2":"1")+" picks from the remaining");
+				$(".dvStage").off("click");
+				$("#btnGame2").show();
+			}
+		}
+	};
+	$(".dvStage").on("click",stageClick);
+	$("#btnGame2").on("click",function(){
+		game2BanCount = 0;
+		$("#btnGame2").hide();
+		$(".banned").removeClass("banned");//reset
+		$(".dvGame.active").removeClass("active");
+		$("#dvGame2").addClass("active");
+		$("#spnPlayerGame1").hide();
+		$("#dvPlayerGame2").show();
+		player1Won = confirm("Did player 1, win?");
+		$("#spnPlayerGame2").text("Player "+(player1Won?"1":"2")+" bans 2 stages");
+		$(".dvStage").on("click",stageClick);
+	});
+	//on check change, set  player1Won = false;
+};
+
+
+
+$(document).ready(S.init);
+</script>
+</head>
+<body  >
+	<main id="main">
+    
+	<div class="container">
+	  <div class="row" id="dvPlayerGame1">
+		<div class="col-sm">
+		  Player <span id="spnPlayerGame1"></span>
+		</div>
+	  </div>
+	  <div class="row" id="dvPlayerGame2" style="display:none;">
+		<div class="col-sm">
+		  Who won? <input type="checkbox" id="chkWinP1"/>
+		  <span id="spnPlayerGame2"></span>
+		</div>
+	  </div>
+	  <div class="row">
+		<div class="col-sm">
+		  Game
+		  <div id="dvGame1" class="dvGame active">1</div> 
+		  <div id="dvGame2" class="dvGame ">2</div> 
+		  <div id="dvGame3" class="dvGame ">3</div> 
+		</div>
+	  </div>
+	  <div class="row">
+		<div class="col-sm">
+		  stage (<span id="spnStageBan"></span>)
+		  <div id="stage1" class="dvStage">1</div> <div id="stage2" class="dvStage">2</div>
+		  <div id="stage2" class="dvStage">2</div> <div id="stage4" class="dvStage">4</div>
+		  <div id="stage3" class="dvStage">3</div> <div id="stage5" class="dvStage">6</div>
+		            <div id="stage7" class="dvStage">7</div>
+		</div>
+	  </div>
+	  <div class="row">
+		  <div class="col-sm">
+			<button id="btnGame2" style="display:none;">Progress to Game2</button>
+		  </div>
+	  </div>
+	</div>
+	
+	
+	</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+</body>
+
+</html>
