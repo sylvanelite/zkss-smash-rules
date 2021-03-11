@@ -1,150 +1,571 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<title>AU</title>
+<title>FLSS</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 
     <meta charset="utf-8">
 
 	<script type="text/javascript" src="./jquery.min.js"></script>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<style type="text/css">
-	.dvStage{
-		background-color:green;
+	/*modals*/
+	.md-modal {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		width: 80%;
+		max-width: 630px;
+		min-width: 320px;
+		height: auto;
+		z-index: 2000;
+		visibility: hidden;
+		backface-visibility: hidden;
+		transform: translateX(-50%) translateY(-50%);
 	}
-	.banned{
-		background-color:red;
+
+	.md-show {
+		visibility: visible;
 	}
-	.dvGame.active{
-		border:4px solid black;
+
+	.md-overlay {
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		visibility: hidden;
+		top: 0;
+		left: 0;
+		z-index: 1000;
+		opacity: 0;
+		background: rgba(80,80,80,0.8);
+		transition: all 0.3s;
 	}
+
+	.md-show ~ .md-overlay {
+		opacity: 1;
+		visibility: visible;
+	}
+	
+	.container {
+		min-height: 100%;
+	}
+	
+	
+	.md-show.md-effect ~ .md-overlay {
+		background: rgba(100,100,100,0.5);
+	}
+
+	.md-show.md-effect ~ .container {
+		-webkit-filter: blur(3px);
+		-moz-filter: blur(3px);
+		filter: blur(3px);
+	}
+
+	.md-effect .md-content {
+		-webkit-transform: translateY(-5%);
+		-moz-transform: translateY(-5%);
+		-ms-transform: translateY(-5%);
+		transform: translateY(-5%);
+		opacity: 0;
+	}
+
+	.md-show.md-effect ~ .container,
+	.md-effect .md-content {
+		-webkit-transition: all 0.3s;
+		-moz-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+
+	.md-show.md-effect .md-content {
+		-webkit-transform: translateY(0);
+		-moz-transform: translateY(0);
+		-ms-transform: translateY(0);
+		transform: translateY(0);
+		opacity: 1;
+	}
+	.md-content{
+		background-color:#fefefe;
+		padding:1rem;
+		text-align:center;
+	}
+	
+	/*Select colours*/
+	
+	.p1{
+		color:#b50305!important;/*   dark*/
+	}
+	.p1-border{
+	    border-width: thick!important;
+		color:gray!important;
+	}
+	.active .p1-border{
+		background-color:#fc9ea0!important;/*light*/
+		border-color:#b50305!important;/*   dark*/
+		color:black!important;
+	}
+	.p2{
+		color:#0340b5!important;/*   dark*/
+	}
+	.p2-border{
+	    border-width: thick!important;
+		color:gray!important;
+	}
+	.p1-border-button{
+	    border-width: thick!important;
+		border-color:#b50305!important;/*   dark*/
+	}
+	.p2-border-button{
+	    border-width: thick!important;
+		border-color:#0340b5!important;/*   dark*/
+	}
+	.active .p2-border{
+		background-color:#98c7f3!important;/*light*/
+		border-color:#0340b5!important;/*   dark*/
+		color:black!important;
+	}
+	
+	
+	
+	/*stages*/
+	.card-title{
+	color:white!important;
+	text-shadow:
+		1px  1px 2px black,
+		1px -1px 2px black,
+	   -1px  1px 2px black,
+	   -1px -1px 2px black!important;
+	}
+	.dvStage {
+	margin-top:5px!important;
+	margin-bottom:5px!important;
+	}
+	.banned .card{
+	opacity:0.75;
+	}
+	.banned .card-img{
+	opacity:0.5;
+	}
+	.banned.p2 .card{
+	border: 4px solid #0340b5!important;
+    background-position: center;
+    background-repeat: no-repeat;
+	background-image:url("./p2banned.png");
+	}
+	.banned.p1 .card{
+	border: 4px solid #b50305!important;
+    background-position: center;
+    background-repeat: no-repeat;
+	background-image:url("./p1banned.png");
+	}
+	.final .card{
+	/*border: 4px solid green!important;*/
+		box-shadow: 0 0 5px #fff, 0 0 5px #ffeb3b, 0 0 5px #ffeb3b, 
+					0 0 5px #ffeb3b, 0 0 5px #ffeb3b, 0 0 5px #ffeb3b, 0 0 5px #ffeb3b;
+		background-color:#ffeb3b;
+	}
+	
+	/*header text*/
+	#spnChosenPlayer{
+		text-decoration:underline;
+	}
+	#spnBanCount{
+		text-decoration:underline;
+	}
+	/*bg effect*/
+	html, body{
+	  height: 100%;
+	  background: linear-gradient(to bottom, #fc9ea0, #98c7f3);
+      overflow: auto;
+	}
+	.conta
+	
+	
 	</style>
 <script type="text/javascript">
-let S = {};
-S.init = function (){
-	let isPlayer1First = (Math.random() >= 0.5);
-	let text = "";
-	if (isPlayer1First) {
-		text="Player 1";
-	}else{
-		text="Player 2";
-	}
-	$("#spnPlayerGame1").text(text+" bans 2 stages");
-	
-	let game1BanCount = 0;
-	let game2BanCount = 0;
-	let gameNumber=1;
-	let player1Won = false;
-	let stageClick =function(){
-		$(this).addClass("banned");
-		$(this).off("click");
-		if($("#spnPlayerGame1").is(":visible")){
-			//banning for game 1
-			game1BanCount+=1;
-			if(game1BanCount==1){
-				$("#spnPlayerGame1").text(text+" bans 1 more stage.");
-			}
-			if(game1BanCount==2){
-				if (isPlayer1First) {
-					text="Player 2";
-				}else{
-					text="Player 1";
-				}
-				$("#spnPlayerGame1").text(text+" bans 3 stages");
-			}
-			if(game1BanCount==3){
-				$("#spnPlayerGame1").text(text+" bans 2 more stages.");
-			}
-			if(game1BanCount==4){
-				$("#spnPlayerGame1").text(text+" bans 1 more stage.");
-			}
-			if(game1BanCount==5){
-				if (isPlayer1First) {
-					text="Player 1";
-				}else{
-					text="Player 2";
-				}
-				$("#spnPlayerGame1").text(text+" bans 1 more stages");
-			}
-			if(game1BanCount==6){
-			
-				$("#spnPlayerGame1").text("Play on"+$(".dvStage:not(.banned)").text());
-				$("#btnGame2").show();
-			}
-		}
-		if($("#spnPlayerGame2").is(":visible")){
-			//banning for game 2
-			game2BanCount+=1;	
-			if(game2BanCount==1){
-				$("#spnPlayerGame2").text("Player "+(player1Won?"1":"2")+" bans 1 more stage");
-			}
-			if(game2BanCount==2){
-				$("#spnPlayerGame2").text("Player "+(player1Won?"2":"1")+" picks from the remaining");
-				$(".dvStage").off("click");
-				$("#btnGame2").show();
-			}
-		}
-	};
-	$(".dvStage").on("click",stageClick);
-	$("#btnGame2").on("click",function(){
-		game2BanCount = 0;
-		$("#btnGame2").hide();
-		$(".banned").removeClass("banned");//reset
-		$(".dvGame.active").removeClass("active");
-		$("#dvGame2").addClass("active");
-		$("#spnPlayerGame1").hide();
-		$("#dvPlayerGame2").show();
-		player1Won = confirm("Did player 1, win?");
-		$("#spnPlayerGame2").text("Player "+(player1Won?"1":"2")+" bans 2 stages");
-		$(".dvStage").on("click",stageClick);
-	});
-	//on check change, set  player1Won = false;
+let S = {
+	varIsGame1:true,
+	varChosenPlayer:(Math.random()>=0.5?1:2),
+	varBanCount:2,
+	varTotalBanCount:0,
+	blindPick1:"<no pick>",
+	blindPick2:"<no pick>"
 };
+S.selectP1 = function(){
+	S.varChosenPlayer = 1;
+	$("#dvGoingFirst").text("Player 1");
+	$("#dvGoingFirst").addClass("p1");
+	$("#dvGoingFirst").removeClass("p2");
+	$("#selectP1").addClass("active");
+	$("#selectP2").removeClass("active");
+	$("#spnStartingText").text("Starting player: Chosen P1");
+};
+S.selectP2 = function(){
+	S.varChosenPlayer = 2;
+	$("#dvGoingFirst").text("Player 2");
+	$("#dvGoingFirst").addClass("p2");
+	$("#dvGoingFirst").removeClass("p1");
+	$("#selectP2").addClass("active");
+	$("#selectP1").removeClass("active");
+	$("#spnStartingText").text("Starting player: Chosen P2");
+};
+S.modalClose = function(){
+	$(".md-modal").removeClass("md-effect");
+	$(".md-modal").removeClass("md-show");
+	S.redrawPage();
+};
+S.modalOpen = function(id){
+	$("#"+id).addClass("md-effect");
+	$("#"+id).addClass("md-show");
+};
+S.redrawPage = function(){
+	$("#spnChosenPlayer").text(S.varChosenPlayer);
+	$("#spnChosenPlayer").removeClass("p1");
+	$("#spnChosenPlayer").removeClass("p2");
+	$("#spnChosenPlayer").addClass("p"+S.varChosenPlayer);
+	if(S.varBanCount>0){
+		$("#spnBanCount").text(S.varBanCount);
+		if(S.varBanCount>1){
+			$("#spnStageDescription").text("stages");
+		}else{
+			$("#spnStageDescription").text("stage");
+		}
+	}else{
+		
+		$("#spnBanCount").text("");
+		$("#spnStageDescription").text(" are complete.");
+	}
+};
+S.clickStage = function(){
+	if($(this).hasClass("banned")){
+		return;//can't click on already chosen stage
+	}
+	if($(this).hasClass("final")){
+		return;//can't click on already chosen stage
+	}
+	$(this).addClass("banned");//mark it as banned
+	S.varTotalBanCount +=1;
+	S.varBanCount -=1;
+	if(S.varIsGame1){
+		if(S.varTotalBanCount==1||
+			S.varTotalBanCount==2){//winner bans 2 stages
+			$(this).addClass("p"+S.varChosenPlayer);
+			if(S.varBanCount==0){
+				S.varBanCount=3;//next player ban count
+				if(S.varChosenPlayer==1){//next player
+					S.varChosenPlayer=2;
+				}else{
+					S.varChosenPlayer=1
+				}
+				alert("P"+S.varChosenPlayer+"'s turn to ban");
+			}
+		}
+		if(S.varTotalBanCount==3||
+			S.varTotalBanCount==4||
+			S.varTotalBanCount==5){//loser bans 3 stages
+			$(this).addClass("p"+S.varChosenPlayer);
+			if(S.varBanCount==0){
+				S.varBanCount=1;//next player ban count
+				if(S.varChosenPlayer==1){//next player
+					S.varChosenPlayer=2;
+				}else{
+					S.varChosenPlayer=1
+				}
+				alert("P"+S.varChosenPlayer+"'s turn to ban");
+			}
+			
+		}
+		if(S.varTotalBanCount==6){//winner bans 1 stage
+			$("#dvFinalStageList").empty();
+			$(this).addClass("p"+S.varChosenPlayer);
+			$(".dvStage:not(.banned)").addClass("final");
+			let chosenStages = $(".final").clone();
+			chosenStages.addClass("mx-auto");
+			$("#dvFinalStageList").append(chosenStages);
+			$("#spnFinalStageDesc").text("Play on this stage: ");	
+			S.modalOpen("modal-stage-result");
+		}
+	}
+	if(!S.varIsGame1){
+		if(S.varTotalBanCount==1||
+			S.varTotalBanCount==2){//winner bans 2 stages
+			$(this).addClass("p"+S.varChosenPlayer);
+		}
+		if(S.varTotalBanCount==2){//choose from remaining
+			$("#dvFinalStageList").empty();
+			$(this).addClass("p"+S.varChosenPlayer);
+			$(".dvStage:not(.banned)").addClass("final");
+			let chosenStages = $(".final").clone();
+			let container = $("<div class='row'></div>");
+			$(container).append(chosenStages);
+			$("#dvFinalStageList").append(container);
+			let playerText = "Player 2";
+			if(S.varChosenPlayer==2){
+				playerText = "Player 1";
+			}
+			$("#spnFinalStageDesc").text(playerText+" can choose one of the following stages:");	
+			S.modalOpen("modal-stage-result");
+		}
+		
+	}
+	
+	
+	S.redrawPage();
+};
+S.nextGame = function(){
+	S.varIsGame1 = false;
+	//reset the divs
+	$(".banned").removeClass("banned");
+	$(".final").removeClass("final");
+	$(".dvStage").removeClass("p1");
+	$(".dvStage").removeClass("p2");
+	S.varBanCount=2;
+	S.varTotalBanCount=0;
+	//reset the modal
+	$("#selectP1Winner").removeClass("active");
+	$("#selectP2Winner").removeClass("active");
+	//block the close button
+	$("#btnSelectWinner").attr("disabled","disabled");
+	$("#btnSelectWinner").addClass("disabled");
+	$("#dvSelectWinner").text("");
+	S.modalOpen("modal-winner");
+};
+S.selectP1Winner = function(){
+	S.varChosenPlayer = 1;
+	$("#dvSelectWinner").text("Player 1");
+	$("#dvSelectWinner").addClass("p1");
+	$("#dvSelectWinner").removeClass("p2");
+	$("#selectP1Winner").addClass("active");
+	$("#selectP2Winner").removeClass("active");
+	$("#btnSelectWinner").prop("disabled",false);
+	$("#btnSelectWinner").removeClass("disabled");
+};
+S.selectP2Winner = function(){
+	S.varChosenPlayer = 2;
+	$("#dvSelectWinner").text("Player 2");
+	$("#dvSelectWinner").addClass("p2");
+	$("#dvSelectWinner").removeClass("p1");
+	$("#selectP2Winner").addClass("active");
+	$("#selectP1Winner").removeClass("active");
+	$("#btnSelectWinner").prop("disabled",false);
+	$("#btnSelectWinner").removeClass("disabled");
+};
+S.blindPickP1 = function(){
+	S.blindPick1 = prompt("Enter your character name").replace(/\W/g, '');
+	$("#btnBlindPickP1").att
+	//assign a random colour to the BG of the button so it's obvious when it clears?
+    let r = Math.floor((Math.random() * 256));
+    let g = Math.floor((Math.random() * 256));
+    let b = Math.floor((Math.random() * 256));
+    $("#btnBlindPickP1").css("background-color", "rgba(" + r + "," + g + "," + b + ", 1.0)");
 
-
-
+};
+S.blindPickP2 = function(){
+	S.blindPick2 = prompt("Enter your character name").replace(/\W/g, '');
+	//assign a random colour to the BG of the button so it's obvious when it clears?
+    let r = Math.floor((Math.random() * 256));
+    let g = Math.floor((Math.random() * 256));
+    let b = Math.floor((Math.random() * 256));
+    $("#btnBlindPickP2").css("background-color", "rgba(" + r + "," + g + "," + b + ", 1.0)");
+};
+S.blindPickShow = function(){
+	alert(`P1 is ${S.blindPick1}
+P2 is ${S.blindPick2}`);
+	S.blindPick1="<reset>";
+	S.blindPick2="<reset>";
+    let b = Math.floor((Math.random() * 256));
+    $("#btnBlindPickP2").css("background-color", "rgba(255,255,255, 0.0)");
+    $("#btnBlindPickP1").css("background-color", "rgba(255,255,255, 0.0)");
+};
+S.init = function (){
+	$(".md-close").on("click",function(){S.modalClose();});
+		
+	$("#selectP1").on("click",S.selectP1);
+	$("#selectP2").on("click",S.selectP2);
+	
+	if(S.varChosenPlayer==1){
+		S.selectP1();
+	}else{
+		S.selectP2();
+	}
+	$("#spnStartingText").text($("#spnStartingText").text()+" at random");
+	$(".dvStage").on("click",S.clickStage);
+	$("#btnNextGame").on("click",S.nextGame);
+	$("#selectP1Winner").on("click",S.selectP1Winner);
+	$("#selectP2Winner").on("click",S.selectP2Winner);
+	$("#btnBlindPickP1").on("click",S.blindPickP1);
+	$("#btnBlindPickP2").on("click",S.blindPickP2);
+	$("#btnBlindPickShow").on("click",S.blindPickShow);
+	S.redrawPage();
+};
 $(document).ready(S.init);
 </script>
 </head>
 <body  >
 	<main id="main">
-    
-	<div class="container">
-	  <div class="row" id="dvPlayerGame1">
-		<div class="col-sm">
-		  Player <span id="spnPlayerGame1"></span>
+    <div class="md-modal  md-effect md-show " id="modal-initial">
+		<div class="md-content">
+			<h3 id="spnStartingText">The starting player is:</h3>
+			<div>
+				<p id="dvGoingFirst"></p>
+				<div class=" mx-auto">
+				  <ul class="pagination pagination-lg justify-content-center">
+					<li class="page-item active" id="selectP1" >
+						<span class="page-link p1 p1-border">
+							1
+						  </span>
+					</li>
+					<li class="page-item "  id="selectP2">
+						<span class="page-link p2 p2-border">
+							2
+						  </span>
+					</li>
+				  </ul>
+				  
+				</div>
+				<button class="md-close btn btn-secondary">Begin!</button>
+			</div>
 		</div>
-	  </div>
-	  <div class="row" id="dvPlayerGame2" style="display:none;">
-		<div class="col-sm">
-		  Who won? <input type="checkbox" id="chkWinP1"/>
-		  <span id="spnPlayerGame2"></span>
-		</div>
-	  </div>
-	  <div class="row">
-		<div class="col-sm">
-		  Game
-		  <div id="dvGame1" class="dvGame active">1</div> 
-		  <div id="dvGame2" class="dvGame ">2</div> 
-		  <div id="dvGame3" class="dvGame ">3</div> 
-		</div>
-	  </div>
-	  <div class="row">
-		<div class="col-sm">
-		  stage (<span id="spnStageBan"></span>)
-		  <div id="stage1" class="dvStage">1</div> <div id="stage2" class="dvStage">2</div>
-		  <div id="stage2" class="dvStage">2</div> <div id="stage4" class="dvStage">4</div>
-		  <div id="stage3" class="dvStage">3</div> <div id="stage5" class="dvStage">6</div>
-		            <div id="stage7" class="dvStage">7</div>
-		</div>
-	  </div>
-	  <div class="row">
-		  <div class="col-sm">
-			<button id="btnGame2" style="display:none;">Progress to Game2</button>
-		  </div>
-	  </div>
 	</div>
+    <div class="md-modal" id="modal-winner">
+		<div class="md-content">
+			<h3>Who won the last game?</h3>
+			<div>
+				<p id="dvSelectWinner"></p>
+				<div class=" mx-auto">
+				  <ul class="pagination pagination-lg justify-content-center">
+					<li class="page-item p1" id="selectP1Winner" >
+					<span class="page-link p1 p1-border">
+							1
+						  </span>
+					</li>
+					<li class="page-item p2" id="selectP2Winner">
+					<span class="page-link p2 p2-border">
+							2
+						  </span>
+					</li>
+				  </ul>
+				</div>
+				<button class="md-close btn btn-secondary disabed" id="btnSelectWinner" disabled>Ok!</button>
+			</div>
+		</div>
+	</div>
+    <div class="md-modal" id="modal-stage-result">
+		<div class="md-content">
+			<h3 id="spnFinalStageDesc">Play on this stage:</h3>
+			<div class="">
+				<div id="dvFinalStageList"></div>
+				<button class="md-close btn btn-secondary">Ok!</button>
+			</div>
+		</div>
+	</div>
+<div class="md-overlay"></div>
+
+	<div class="container "> 
 	
+		<div class="row">
+			<div class="col" >
+				<h1 style="text-align:center;">
+				<span id="spnExpainText">
+					Player <span id="spnChosenPlayer"></span>
+					bans <span id="spnBanCount"></span>
+					<span id="spnStageDescription"></span>
+				</span>
+				</h1>
+			</div>
+		</div>	
+		
+		<!--stages-->
+		<div class="row">
+			<div class="col-12" >
+				<div class="row">
+					<div class="col-6 dvStage" >
+						<div class="card bg-dark text-white">
+						  <img src="./stg_battlefield.jpg" class="card-img" alt="Battlefield">
+						  <div class="card-img-overlay">
+							<h5 class="card-title">Battlefield</h5>
+						  </div>
+						</div>
+					</div>
+					<div class="col-6 dvStage" >
+						<div class="card bg-dark text-white">
+						  <img src="./stg_smallbattlefield.jpg" class="card-img" alt="Small Battlefield">
+						  <div class="card-img-overlay">
+							<h5 class="card-title">Small Battlefield</h5>
+						  </div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 dvStage" >
+						<div class="card bg-dark text-white">
+						  <img src="./stg_townandcity.jpg" class="card-img" alt="Town And City">
+						  <div class="card-img-overlay">
+							<h5 class="card-title">Town And City</h5>
+						  </div>
+						</div>
+					</div>
+					<div class="col-6 dvStage" >
+						<div class="card bg-dark text-white">
+						  <img src="./stg_smashville.jpg" class="card-img" alt="Smashville">
+						  <div class="card-img-overlay">
+							<h5 class="card-title">Smashville</h5>
+						  </div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 dvStage" >
+						<div class="card bg-dark text-white">
+						  <img src="./stg_pokemonstadium2.jpg" class="card-img" alt="Pokemon Stadium 2">
+						  <div class="card-img-overlay">
+							<h5 class="card-title">Pokemon Stadium 2</h5>
+						  </div>
+						</div>
+					</div>
+					<div class="col-6 dvStage" >
+						<div class="card bg-dark text-white">
+						  <img src="./stg_finaldestination.jpg" class="card-img" alt="Final Destination">
+						  <div class="card-img-overlay">
+							<h5 class="card-title">Final Destination</h5>
+						  </div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-3" ></div>
+					<div class="col-6 dvStage" >
+						<div class="card bg-dark text-white">
+						  <img src="./stg_lylatcruise.jpg" class="card-img" alt="Lylat Cruise">
+						  <div class="card-img-overlay">
+							<h5 class="card-title">Lylat Cruise</h5>
+						  </div>
+						</div>
+					</div>
+					<div class="col-3" ></div>
+				</div>
+			</div>
+		</div>	
+		<div class="row" style="padding-top:2rem;">
+			<div class="col" style="text-align:center;" >
+				<button class="btn btn-secondary" id="btnNextGame">Next Game</button>
+			</div>
+		</div>	
+			
+		<div class="row" style="padding-top:2rem;">
+			<div class="col-6" style="text-align:center;" >
+				<button class="btn p1 p1-border-button" id="btnBlindPickP1">P1 </button>
+				<button class="btn p2 p2-border-button" id="btnBlindPickP2">P2 </button>
+			</div>
+			<div class="col-6" style="text-align:center;" >
+				<button class="btn btn-secondary" id="btnBlindPickShow">Show Blind Picks</button>
+			</div>
+		</div>	
+		<br/>
+		<br/>
+		<br/>
+		
+		
+	</div>	
 	
 	</main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
