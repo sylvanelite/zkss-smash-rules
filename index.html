@@ -187,6 +187,7 @@ let S = {
 	varChosenPlayer:(Math.random()>=0.5?1:2),
 	varBanCount:2,
 	varTotalBanCount:0,
+	varUndoStack:[],
 	blindPick1:"<no pick>",
 	blindPick2:"<no pick>"
 };
@@ -230,10 +231,51 @@ S.redrawPage = function(){
 			$("#spnStageDescription").text("stage");
 		}
 	}else{
-		
 		$("#spnBanCount").text("");
 		$("#spnStageDescription").text(" are complete.");
 	}
+	let canUndo =true;
+	//can't undo if 1st or final choice
+	if(S.varUndoStack.length==0){
+		canUndo = false;
+	}
+	if($(".final").length){
+		canUndo = false;
+	}
+	if(canUndo){
+		$("#btnUndo").prop("disabled",false);
+	}else{
+		$("#btnUndo").attr("disabled","disabled");
+	}
+};
+S.undoSelection = function(){
+	if(S.varUndoStack.length==0){
+		return;//nothing to undo
+	}
+	let undoElem = S.varUndoStack.pop();
+	undoElem.removeClass("banned");//undo what was marked as banned
+	undoElem.removeClass("p1");//undo person who selected it
+	undoElem.removeClass("p2");
+	//check for player transitions
+	if(S.varIsGame1){
+		//check if the count has toggled, if so select the previous player
+		if(S.varTotalBanCount==2||
+			S.varTotalBanCount==5){//1st banner has used all their bans
+			S.varBanCount=0;//At a turn change, they will always have 0 bans remaining (becomes 1 below)
+			if(S.varChosenPlayer==1){
+				S.varChosenPlayer=2;
+			}else{
+				S.varChosenPlayer=1;
+			}
+		}
+	}
+	//if(!S.varIsGame1)// nothing to do, since only 1 player bans there will not be a toggle
+	//apply the change in ban count
+	S.varTotalBanCount -=1;
+	S.varBanCount +=1;
+	//nothing to do for game > 1
+	S.redrawPage();
+	
 };
 S.clickStage = function(){
 	if($(this).hasClass("banned")){
@@ -245,6 +287,7 @@ S.clickStage = function(){
 	$(this).addClass("banned");//mark it as banned
 	S.varTotalBanCount +=1;
 	S.varBanCount -=1;
+	S.varUndoStack.push($(this));
 	if(S.varIsGame1){
 		if(S.varTotalBanCount==1||
 			S.varTotalBanCount==2){//winner bans 2 stages
@@ -320,6 +363,7 @@ S.nextGame = function(){
 	$(".dvStage").removeClass("p2");
 	S.varBanCount=2;
 	S.varTotalBanCount=0;
+	S.varUndoStack=[];
 	//reset the modal
 	$("#selectP1Winner").removeClass("active");
 	$("#selectP2Winner").removeClass("active");
@@ -395,6 +439,7 @@ S.init = function (){
 	$("#btnBlindPickP1").on("click",S.blindPickP1);
 	$("#btnBlindPickP2").on("click",S.blindPickP2);
 	$("#btnBlindPickShow").on("click",S.blindPickShow);
+	$("#btnUndo").on("click",S.undoSelection);
 	S.redrawPage();
 };
 $(document).ready(S.init);
@@ -541,7 +586,8 @@ $(document).ready(S.init);
 						  </div>
 						</div>
 					</div>
-					<div class="col-3" ></div>
+					<div class="col-1" ></div>
+					<div class="col-2 d-flex flex-column" > <button class="btn mt-auto btn-outline-secondary" id="btnUndo">Undo </button></div>
 				</div>
 			</div>
 		</div>	
